@@ -404,6 +404,7 @@ require('which-key').register {
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
   ['<leader>l'] = { name = '[L]SP', _ = 'which_key_ignore' },
+  ['<leader>f'] = { name = '[F]ormatter', _ = 'which_key_ignore' },
   ['<leader>e'] = { name = 'File [E]xplorer', _ = 'which_key_ignore' },
 }
 
