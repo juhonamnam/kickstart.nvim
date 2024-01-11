@@ -27,8 +27,9 @@ local on_attach = function(_, bufnr)
   nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
   nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
   nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  nmap('<leader>wl', function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
-    '[W]orkspace [L]ist Folders')
+  nmap('<leader>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, '[W]orkspace [L]ist Folders')
 end
 
 local init = function()
@@ -37,7 +38,6 @@ local init = function()
   require('mason-lspconfig').setup()
   -- Setup neovim lua configuration
   require('neodev').setup()
-
 
   -- Enable the following language servers
   --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -87,16 +87,18 @@ local init = function()
 end
 
 return {
-  dependencies = {
+  dep = {
     'neovim/nvim-lspconfig',
     -- Automatically install LSPs to stdpath for neovim
-    'williamboman/mason-lspconfig.nvim',
-    -- Useful status updates for LSP
-    -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-    { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
+    dependencies = {
+      'williamboman/mason-lspconfig.nvim',
+      -- Useful status updates for LSP
+      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+      { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
 
-    -- Additional lua configuration, makes nvim stuff amazing!
-    'folke/neodev.nvim',
+      -- Additional lua configuration, makes nvim stuff amazing!
+      'folke/neodev.nvim',
+    },
   },
-  init = init
+  init = init,
 }

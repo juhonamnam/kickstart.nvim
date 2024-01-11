@@ -42,6 +42,7 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.opt.relativenumber = true
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -67,10 +68,6 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
-  -- Git related plugins
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
-
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
@@ -91,46 +88,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
-  {
-    -- Adds git related signs to the gutter, as well as utilities for managing changes
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      -- See `:help gitsigns.txt`
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
-      on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>gh', require('gitsigns').preview_hunk,
-          { buffer = bufnr, desc = 'Preview [G]it [H]unk' })
-
-        -- don't override the built-in and fugitive keymaps
-        local gs = package.loaded.gitsigns
-        vim.keymap.set({ 'n', 'v' }, ']h', function()
-          if vim.wo.diff then
-            return ']h'
-          end
-          vim.schedule(function()
-            gs.next_hunk()
-          end)
-          return '<Ignore>'
-        end, { expr = true, buffer = bufnr, desc = 'Jump to next hunk' })
-        vim.keymap.set({ 'n', 'v' }, '[h', function()
-          if vim.wo.diff then
-            return '[h'
-          end
-          vim.schedule(function()
-            gs.prev_hunk()
-          end)
-          return '<Ignore>'
-        end, { expr = true, buffer = bufnr, desc = 'Jump to previous hunk' })
-      end,
-    },
-  },
+  { 'folke/which-key.nvim', opts = {} },
 
   {
     -- Theme inspired by Atom
@@ -201,11 +159,12 @@ require('lazy').setup({
   {
     'nvim-tree/nvim-tree.lua',
     dependencies = {
-      'nvim-tree/nvim-web-devicons'
-    }
+      'nvim-tree/nvim-web-devicons',
+    },
   },
 
-  require('language-support')
+  require 'git-support',
+  require 'language-support',
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -325,8 +284,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-      'bash' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -458,10 +416,10 @@ cmp.setup {
 
 -- Configure nvim-tree
 local nvim_tree_on_attach = function(bufnr)
-  local api = require "nvim-tree.api"
+  local api = require 'nvim-tree.api'
 
   local function opts(desc)
-    return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
   end
 
   -- default mappings
@@ -469,19 +427,19 @@ local nvim_tree_on_attach = function(bufnr)
 
   -- custom mappings
   -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent, opts('Up'))
-  vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
+  vim.keymap.set('n', '?', api.tree.toggle_help, opts 'Help')
 end
 
-require('nvim-tree').setup({
+require('nvim-tree').setup {
   on_attach = nvim_tree_on_attach,
-})
+}
 
 -- nvim-tree keymap
 vim.keymap.set('n', '<leader>et', ':NvimTreeToggle<CR>', { desc = 'File [E]xplorer [T]oggle' })
 vim.keymap.set('n', '<leader>ef', ':NvimTreeFocus<CR>', { desc = 'File [E]xplorer [F]ocus' })
 vim.keymap.set('n', '<leader>er', ':NvimTreeRefresh<CR>', { desc = 'File [E]xplorer [R]efresh' })
 
-require('nvim-web-devicons').setup({})
+require('nvim-web-devicons').setup {}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

@@ -1,25 +1,28 @@
 local config = function()
-  local conform = require('conform')
+  local conform = require 'conform'
 
   conform.setup {
     formatters_by_ft = {
+      -- stylua
+      lua = { 'stylua' },
+
+      -- prettier
       javascript = { 'prettier' },
       typescript = { 'prettier' },
       javascriptreact = { 'prettier' },
       typescriptreact = { 'prettier' },
       html = { 'prettier' },
       css = { 'prettier' },
-    }
+    },
   }
 
   vim.keymap.set('n', '<leader>ff', function()
-    conform.format({ async = false, lsp_fallback = true })
-  end, { desc = '[F]ormatter [F]ormat' }
-  )
+    conform.format { async = false, lsp_fallback = true }
+  end, { desc = '[F]ormatter [F]ormat' })
 end
 
 return {
   'stevearc/conform.nvim',
   event = { 'BufReadPre', 'BufNewFile' },
-  config = config
+  config = config,
 }

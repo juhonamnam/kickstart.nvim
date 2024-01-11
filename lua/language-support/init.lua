@@ -9,8 +9,8 @@ return {
   -- LSP Configuration & Plugins
   'williamboman/mason.nvim',
   dependencies = {
-    require("language-support.formatter"),
-    unpack(require("language-support.lsp").dependencies),
+    require 'language-support.formatter',
+    require('language-support.lsp').dep,
   },
   init = init,
 }
