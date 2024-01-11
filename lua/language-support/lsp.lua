@@ -1,3 +1,5 @@
+local M = {}
+
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
@@ -32,7 +34,21 @@ local on_attach = function(_, bufnr)
   end, '[W]orkspace [L]ist Folders')
 end
 
-local init = function()
+M.dep = {
+  'neovim/nvim-lspconfig',
+  -- Automatically install LSPs to stdpath for neovim
+  dependencies = {
+    'williamboman/mason-lspconfig.nvim',
+    -- Useful status updates for LSP
+    -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+    { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
+
+    -- Additional lua configuration, makes nvim stuff amazing!
+    'folke/neodev.nvim',
+  },
+}
+
+function M.init()
   -- mason-lspconfig requires that these setup functions are called in this order
   -- before setting up the servers.
   require('mason-lspconfig').setup()
@@ -86,19 +102,4 @@ local init = function()
   }
 end
 
-return {
-  dep = {
-    'neovim/nvim-lspconfig',
-    -- Automatically install LSPs to stdpath for neovim
-    dependencies = {
-      'williamboman/mason-lspconfig.nvim',
-      -- Useful status updates for LSP
-      -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
-
-      -- Additional lua configuration, makes nvim stuff amazing!
-      'folke/neodev.nvim',
-    },
-  },
-  init = init,
-}
+return M
