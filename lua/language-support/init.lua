@@ -1,6 +1,10 @@
+local lsp = require 'language-support.lsp'
+local formatter = require 'language-support.formatter'
+
 local init = function()
   require('mason').setup()
-  require('language-support.lsp').init()
+  lsp.init()
+  formatter.init()
 end
 
 -- NOTE: This is where your plugins related to LSP can be installed.
@@ -9,8 +13,8 @@ return {
   -- LSP Configuration & Plugins
   'williamboman/mason.nvim',
   dependencies = {
-    require 'language-support.formatter',
-    require('language-support.lsp').dep,
+    lsp.dep,
+    formatter.dep,
   },
   init = init,
 }
