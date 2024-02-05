@@ -2,6 +2,23 @@ local M = {}
 
 M.dep = 'mhartington/formatter.nvim'
 
+local function check_file_exists(name)
+  local f = io.open(name, 'r')
+  return f ~= nil and io.close(f)
+end
+
+local formatters_override = {
+  prettier = function(orig_command)
+    local is_local_yarn = check_file_exists '.yarn/sdks/prettier/index.js'
+
+    if is_local_yarn then
+      orig_command.exe = 'yarn prettier'
+    end
+
+    return orig_command
+  end,
+}
+
 function M.init()
   vim.keymap.set('n', '<leader>ff', ':Format<CR>', { desc = '[F]ormatter [F]ormat' })
 
@@ -51,8 +68,17 @@ function M.init()
           end
 
           if selected_formatter ~= nil then
-            print('Format with ' .. selected_formatter.name)
-            return selected_formatter.func()
+            local command = selected_formatter.func()
+
+            if formatters_override[selected_formatter.name] ~= nil then
+              command = formatters_override[selected_formatter.name](command)
+            end
+
+            if command ~= nil then
+              return command and print('Format with ' .. selected_formatter.name)
+            end
+
+            print 'Formatter not found'
           else
             print 'Formatter not found'
           end
