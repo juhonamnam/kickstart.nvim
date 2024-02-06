@@ -75,7 +75,8 @@ function M.init()
             end
 
             if command ~= nil then
-              return command and print('Format with ' .. selected_formatter.name)
+              print('Format with ' .. selected_formatter.name)
+              return command
             end
 
             print 'Formatter not found'
