@@ -16,6 +16,7 @@ return {
     on_attach = function(bufnr)
       vim.keymap.set('n', '<leader>gh', require('gitsigns').preview_hunk, { buffer = bufnr, desc = 'Preview [G]it [H]unk' })
       vim.keymap.set('n', '<leader>gs', ':Gdiffsplit<CR>', { buffer = bufnr, desc = '[G]it Diff [S]plit' })
+      vim.keymap.set('n', '<leader>gt', require('gitsigns').toggle_current_line_blame, { buffer = bufnr, desc = '[G]it [T]oggle Current Line Blame' })
 
       -- don't override the built-in and fugitive keymaps
       local gs = package.loaded.gitsigns

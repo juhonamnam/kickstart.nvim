@@ -14,6 +14,7 @@ local on_attach = function(_, bufnr)
   end
 
   nmap('<leader>lr', vim.lsp.buf.rename, '[L]sp [R]ename')
+  nmap('<leader>lR', ':LspRestart<CR>', '[L]sp [R]estart')
   nmap('<leader>lc', vim.lsp.buf.code_action, '[L]sp [C]ode Action')
   nmap('<leader>lt', vim.lsp.buf.type_definition, '[L]sp [T]ype Definition')
   nmap('<leader>ld', require('telescope.builtin').lsp_document_symbols, '[L]sp [D]ocument Symbols')

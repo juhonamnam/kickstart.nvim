@@ -168,6 +168,7 @@ require('lazy').setup({
 
   require 'git-support',
   require 'language-support',
+  require 'copilot',
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -358,7 +359,7 @@ vim.keymap.set('n', '<leader>dl', vim.diagnostic.setloclist, { desc = 'Open [D]i
 
 -- document existing key chains
 require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+  ['<leader>c'] = { name = '[C]opilot', _ = 'which_key_ignore' },
   ['<leader>d'] = { name = '[D]iagnostics', _ = 'which_key_ignore' },
   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
