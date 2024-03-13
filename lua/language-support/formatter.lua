@@ -7,6 +7,14 @@ local function check_file_exists(name)
   return f ~= nil and io.close(f)
 end
 
+local filetypes_override = {
+  scss = function(_)
+    return {
+      prettier = require('formatter.util').withl(require 'formatter.defaults.prettier', 'scss'),
+    }
+  end,
+}
+
 local formatters_override = {
   prettier = function(orig_command)
     local is_local_yarn = check_file_exists '.yarn/sdks/prettier/index.js'
@@ -39,14 +47,18 @@ function M.init()
           local formatters
           local installed_formatters = {}
 
-          if pcall(function()
+          pcall(function()
             formatters = require(modname)
-          end) then
-            for name, func in pairs(formatters) do
-              local installed = registry.is_installed(name)
-              if installed then
-                table.insert(installed_formatters, { name = name, func = func })
-              end
+          end)
+
+          if filetypes_override[vim.bo.filetype] ~= nil then
+            formatters = filetypes_override[vim.bo.filetype](formatters)
+          end
+
+          for name, func in pairs(formatters) do
+            local installed = registry.is_installed(name)
+            if installed then
+              table.insert(installed_formatters, { name = name, func = func })
             end
           end
 
