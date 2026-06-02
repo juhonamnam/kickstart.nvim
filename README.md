@@ -29,3 +29,4 @@ sudo apt install ripgrep
 sudo apt install xclip
 ```
 
+- Install [Nerd Font](https://www.nerdfonts.com/) for better icons

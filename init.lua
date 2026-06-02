@@ -152,6 +152,7 @@ require('lazy').setup({
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
@@ -352,22 +353,35 @@ vim.defer_fn(function()
 end, 0)
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.jump { count = -1, float = true }
+end, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.jump { count = 1, float = true }
+end, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>dm', vim.diagnostic.open_float, { desc = 'Open floating [D]iagnostic [M]essage' })
 vim.keymap.set('n', '<leader>dl', vim.diagnostic.setloclist, { desc = 'Open [D]iagnostics [L]ist' })
 
 -- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]opilot', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]iagnostics', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-  ['<leader>l'] = { name = '[L]SP', _ = 'which_key_ignore' },
-  ['<leader>f'] = { name = '[F]ormatter', _ = 'which_key_ignore' },
-  ['<leader>e'] = { name = 'File [E]xplorer', _ = 'which_key_ignore' },
+require('which-key').add {
+  { '<leader>c', group = '[C]opilot' },
+  { '<leader>c_', hidden = true },
+  { '<leader>d', group = '[D]iagnostics' },
+  { '<leader>d_', hidden = true },
+  { '<leader>g', group = '[G]it' },
+  { '<leader>g_', hidden = true },
+  { '<leader>r', group = '[R]ename' },
+  { '<leader>r_', hidden = true },
+  { '<leader>s', group = '[S]earch' },
+  { '<leader>s_', hidden = true },
+  { '<leader>w', group = '[W]orkspace' },
+  { '<leader>w_', hidden = true },
+  { '<leader>l', group = '[L]SP' },
+  { '<leader>l_', hidden = true },
+  { '<leader>f', group = '[F]ormatter' },
+  { '<leader>f_', hidden = true },
+  { '<leader>e', group = '[E]xplorer' },
+  { '<leader>e_', hidden = true },
 }
 
 -- [[ Configure nvim-cmp ]]
@@ -439,9 +453,9 @@ require('nvim-tree').setup {
 }
 
 -- nvim-tree keymap
-vim.keymap.set('n', '<leader>et', ':NvimTreeToggle<CR>', { desc = 'File [E]xplorer [T]oggle' })
-vim.keymap.set('n', '<leader>ef', ':NvimTreeFocus<CR>', { desc = 'File [E]xplorer [F]ocus' })
-vim.keymap.set('n', '<leader>er', ':NvimTreeRefresh<CR>', { desc = 'File [E]xplorer [R]efresh' })
+vim.keymap.set('n', '<leader>et', ':NvimTreeToggle<CR>', { desc = '[E]xplorer [T]oggle' })
+vim.keymap.set('n', '<leader>ef', ':NvimTreeFocus<CR>', { desc = '[E]xplorer [F]ocus' })
+vim.keymap.set('n', '<leader>er', ':NvimTreeRefresh<CR>', { desc = '[E]xplorer [R]efresh' })
 
 require('nvim-web-devicons').setup {}
 
