@@ -1,33 +1,90 @@
 do
-  vim.pack.add { 'https://github.com/nvim-tree/nvim-tree.lua' }
-  vim.pack.add { 'https://github.com/nvim-tree/nvim-web-devicons' }
+  vim.pack.add { 'mhartington/formatter.nvim' }
 
-  -- Configure nvim-tree
-  local nvim_tree_on_attach = function(bufnr)
-    local api = require 'nvim-tree.api'
-
-    local function opts(desc) return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true } end
-
-    -- default mappings
-    api.map.on_attach.default(bufnr)
-
-    -- custom mappings
-    -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent, opts('Up'))
-    vim.keymap.set('n', '?', api.tree.toggle_help, opts 'Help')
+  local function check_file_exists(name)
+    local f = io.open(name, 'r')
+    return f ~= nil and io.close(f)
   end
 
-  require('nvim-tree').setup {
-    on_attach = nvim_tree_on_attach,
+  local filetypes_override = {
+    scss = function(_)
+      return {
+        prettier = require('formatter.util').withl(require 'formatter.defaults.prettier', 'scss'),
+      }
+    end,
   }
 
-  -- nvim-tree keymap
-  require('which-key').add {
-    { '<leader>e', group = '[E]xplorer' },
-    { '<leader>e_', hidden = true },
-  }
-  vim.keymap.set('n', '<leader>et', ':NvimTreeToggle<CR>', { desc = '[E]xplorer [T]oggle' })
-  vim.keymap.set('n', '<leader>ef', ':NvimTreeFocus<CR>', { desc = '[E]xplorer [F]ocus' })
-  vim.keymap.set('n', '<leader>er', ':NvimTreeRefresh<CR>', { desc = '[E]xplorer [R]efresh' })
+  local formatters_override = {
+    prettier = function(orig_command)
+      local is_local_yarn = check_file_exists '.yarn/sdks/prettier/index.js'
 
-  require('nvim-web-devicons').setup {}
+      if is_local_yarn then orig_command.exe = 'yarn prettier' end
+
+      return orig_command
+    end,
+  }
+
+  vim.keymap.set('n', '<leader>ff', ':Format<CR>', { desc = '[F]ormatter [F]ormat' })
+
+  local registry = require 'mason-registry'
+
+  -- Provides the Format, FormatWrite, FormatLock, and FormatWriteLock commands
+  require('formatter').setup {
+    -- Enable or disable logging
+    logging = true,
+    -- Set the log level
+    log_level = vim.log.levels.WARN,
+
+    filetype = {
+      ['*'] = {
+        function()
+          local modname = 'formatter.filetypes.' .. vim.bo.filetype
+
+          local formatters
+          local installed_formatters = {}
+
+          pcall(function() formatters = require(modname) end)
+
+          if filetypes_override[vim.bo.filetype] ~= nil then formatters = filetypes_override[vim.bo.filetype](formatters) end
+
+          for name, func in pairs(formatters) do
+            local installed = registry.is_installed(name)
+            if installed then table.insert(installed_formatters, { name = name, func = func }) end
+          end
+
+          local count = #installed_formatters
+
+          local selected_formatter
+
+          if count == 1 then
+            selected_formatter = installed_formatters[1]
+          elseif count > 1 then
+            local msg = ''
+            for idx, f in pairs(installed_formatters) do
+              msg = msg .. idx .. ') ' .. f.name .. '\n'
+            end
+            local i = vim.fn.input('select formatter\n' .. msg)
+            print '\n'
+            local idx = tonumber(i)
+            selected_formatter = installed_formatters[idx]
+          end
+
+          if selected_formatter ~= nil then
+            local command = selected_formatter.func()
+
+            if formatters_override[selected_formatter.name] ~= nil then command = formatters_override[selected_formatter.name](command) end
+
+            if command ~= nil then
+              print('Format with ' .. selected_formatter.name)
+              return command
+            end
+
+            print 'Formatter not found'
+          else
+            print 'Formatter not found'
+          end
+        end,
+      },
+    },
+  }
 end
