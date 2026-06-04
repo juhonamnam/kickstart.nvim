@@ -99,7 +99,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -110,7 +110,7 @@ do
   vim.o.number = true
   -- You can also add relative line numbers, to help with jumping.
   --  Experiment for yourself to see if you like it!
-  -- vim.o.relativenumber = true
+  vim.o.relativenumber = true
 
   -- Enable mouse mode, can be useful for resizing splits for example!
   vim.o.mouse = 'a'
@@ -321,7 +321,7 @@ local function gh(repo) return 'https://github.com/' .. repo end
 
 -- ============================================================
 -- SECTION 3: UI / CORE UX PLUGINS
--- guess-indent, gitsigns, which-key, colorscheme, todo-comments, mini modules
+-- guess-indent, which-key, colorscheme, todo-comments, mini modules
 -- ============================================================
 do
   -- [[ Installing and Configuring Plugins ]]
@@ -347,21 +347,6 @@ do
   -- since otherwise the icons won't display properly.
   if vim.g.have_nerd_font then vim.pack.add { gh 'nvim-tree/nvim-web-devicons' } end
 
-  -- Here is a more advanced configuration example that passes options to `gitsigns.nvim`
-  --
-  -- See `:help gitsigns` to understand what each configuration key does.
-  -- Adds git related signs to the gutter, as well as utilities for managing changes
-  vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
-  require('gitsigns').setup {
-    signs = {
-      add = { text = '+' }, ---@diagnostic disable-line: missing-fields
-      change = { text = '~' }, ---@diagnostic disable-line: missing-fields
-      delete = { text = '_' }, ---@diagnostic disable-line: missing-fields
-      topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
-      changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
-    },
-  }
-
   -- Useful plugin to show you pending keybinds.
   vim.pack.add { gh 'folke/which-key.nvim' }
   require('which-key').setup {
@@ -371,8 +356,6 @@ do
     -- Document existing key chains
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
-      { '<leader>t', group = '[T]oggle' },
-      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
   }
@@ -410,21 +393,21 @@ do
   --  - va)  - [V]isually select [A]round [)]paren
   --  - yiiq - [Y]ank [I]nside [I]+1 [Q]uote
   --  - ci'  - [C]hange [I]nside [']quote
-  require('mini.ai').setup {
-    -- NOTE: Avoid conflicts with the built-in incremental selection mappings on Neovim>=0.12 (see `:help treesitter-incremental-selection`)
-    mappings = {
-      around_next = 'aa',
-      inside_next = 'ii',
-    },
-    n_lines = 500,
-  }
+  -- require('mini.ai').setup {
+  --   -- NOTE: Avoid conflicts with the built-in incremental selection mappings on Neovim>=0.12 (see `:help treesitter-incremental-selection`)
+  --   mappings = {
+  --     around_next = 'aa',
+  --     inside_next = 'ii',
+  --   },
+  --   n_lines = 500,
+  -- }
 
   -- Add/delete/replace surroundings (brackets, quotes, etc.)
   --
   -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
   -- - sd'   - [S]urround [D]elete [']quotes
   -- - sr)'  - [S]urround [R]eplace [)] [']
-  require('mini.surround').setup()
+  -- require('mini.surround').setup()
 
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
@@ -437,7 +420,7 @@ do
   -- default behavior. For example, here we set the section for
   -- cursor location to LINE:COLUMN
   ---@diagnostic disable-next-line: duplicate-set-field
-  statusline.section_location = function() return '%2l:%-2v' end
+  -- statusline.section_location = function() return '%2l:%-2v' end
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
@@ -676,7 +659,7 @@ do
       --
       -- This may be unwanted, since they displace some of your code
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
-        map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+        map('grh', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle Inlay [H]ints')
       end
     end,
   })
@@ -766,41 +749,8 @@ end
 
 -- ============================================================
 -- SECTION 6: FORMATTING
--- conform.nvim setup and keymap
+-- Prettier handled separately.
 -- ============================================================
-do
-  -- [[ Formatting ]]
-  vim.pack.add { gh 'stevearc/conform.nvim' }
-  require('conform').setup {
-    notify_on_error = false,
-    format_on_save = function(bufnr)
-      -- You can specify filetypes to autoformat on save here:
-      local enabled_filetypes = {
-        -- lua = true,
-        -- python = true,
-      }
-      if enabled_filetypes[vim.bo[bufnr].filetype] then
-        return { timeout_ms = 500 }
-      else
-        return nil
-      end
-    end,
-    default_format_opts = {
-      lsp_format = 'fallback', -- Use external formatters if configured below, otherwise use LSP formatting. Set to `false` to disable LSP formatting entirely.
-    },
-    -- You can also specify external formatters in here.
-    formatters_by_ft = {
-      -- rust = { 'rustfmt' },
-      -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
-      --
-      -- You can use 'stop_after_first' to run the first available formatter from the list
-      -- javascript = { "prettierd", "prettier", stop_after_first = true },
-    },
-  }
-
-  vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
-end
 
 -- ============================================================
 -- SECTION 7: AUTOCOMPLETE & SNIPPETS
@@ -975,3 +925,10 @@ end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+do
+  require 'git-support'
+  require 'file-explorer'
+  require 'copilot'
+  require 'formatter-preset'
+end
