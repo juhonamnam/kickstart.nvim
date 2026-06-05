@@ -621,6 +621,8 @@ do
       -- or a suggestion from your LSP for this to activate.
       map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
 
+      map('grv', vim.lsp.buf.hover, 'Ho[v]er Documentation')
+
       -- WARN: This is not Goto Definition, this is Goto Declaration.
       --  For example, in C this would take you to the header.
       map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -743,10 +745,22 @@ do
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-  for name, server in pairs(servers) do
-    vim.lsp.config(name, server)
-    vim.lsp.enable(name)
+  local registry = require 'mason-registry'
+
+  local function apply_lsp()
+    local packages = registry.get_installed_packages()
+    for _, pkg in ipairs(packages) do
+      if vim.tbl_contains(pkg.spec.categories or {}, 'LSP') then
+        local name = pkg.spec.neovim.lspconfig
+        vim.lsp.config(name, servers[name] or {})
+        vim.lsp.enable(name)
+      end
+    end
   end
+
+  apply_lsp()
+
+  vim.keymap.set('n', 'grR', apply_lsp, { desc = '[R]eload LSP Servers' })
 end
 
 -- ============================================================
