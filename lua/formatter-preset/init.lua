@@ -1,5 +1,5 @@
 do
-  vim.pack.add { 'mhartington/formatter.nvim' }
+  vim.pack.add { 'https://github.com/mhartington/formatter.nvim' }
 
   local function check_file_exists(name)
     local f = io.open(name, 'r')
